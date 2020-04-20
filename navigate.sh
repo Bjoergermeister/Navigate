@@ -31,7 +31,7 @@ fi
 
 case $1 in 
 "add")
-    add $2 $3
+    add "$2" "$3"
     ;;
 "remove")
     remove $2
