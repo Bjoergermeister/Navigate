@@ -15,7 +15,8 @@ function remove() {
 }
 
 function list() {
-    echo List
+    query=$(sqlite3 $database "SELECT * from paths";)
+    echo $query
 }
 
 function navigate() {
