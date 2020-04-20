@@ -7,7 +7,9 @@ function setupDatabase() {
 }
 
 function add() {
-    echo Add
+    echo $1
+    echo $2
+    sqlite3 $database "INSERT INTO paths VALUES ('$1', '$2');"
 }
 
 function remove() {
@@ -19,8 +21,8 @@ function list() {
 }
 
 function navigate() {
-    #query=$(sqlite3 navigate.sqlite "SELECT path from paths where name='$1';")
-    echo $1
+    query=$(sqlite3 navigate.sqlite "SELECT path from paths where name='$1';")
+    echo $query
 }
 
 #Setup database if it doesn't exist
@@ -31,7 +33,7 @@ fi
 
 case $1 in 
 "add")
-    add
+    add $2 $3
     ;;
 "remove")
     remove
