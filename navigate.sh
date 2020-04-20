@@ -7,13 +7,11 @@ function setupDatabase() {
 }
 
 function add() {
-    echo $1
-    echo $2
     sqlite3 $database "INSERT INTO paths VALUES ('$1', '$2');"
 }
 
 function remove() {
-    echo Remove
+    sqlite3 $database "DELETE FROM paths where name='$1';"
 }
 
 function list() {
@@ -36,7 +34,7 @@ case $1 in
     add $2 $3
     ;;
 "remove")
-    remove
+    remove $2
     ;;
 "list")
     list
