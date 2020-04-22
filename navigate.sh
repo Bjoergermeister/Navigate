@@ -3,7 +3,9 @@
 database="navigate.sqlite"
 
 function setupDatabase() {
+    echo No database found, creating new database..
     sqlite3 $database "CREATE TABLE paths (name varchar, path varchar);"
+    echo Done
 }
 
 function add() {
@@ -15,8 +17,12 @@ function remove() {
 }
 
 function list() {
-    query=$(sqlite3 $database "SELECT * from paths";)
-    echo $query
+    query=$(sqlite3 $database "SELECT COUNT(name) from paths";)
+
+    for ((i = 0; i < $query; i++)); do
+        row=$(sqlite3 $database "SELECT * FROM paths LIMIT 1 OFFSET $i;")
+        echo $row
+    done
 }
 
 function navigate() {
@@ -26,7 +32,6 @@ function navigate() {
 
 #Setup database if it doesn't exist
 if [[ ! -e ${database} ]]; then
-    echo Database file doesnt exist
     setupDatabase
 fi
 
