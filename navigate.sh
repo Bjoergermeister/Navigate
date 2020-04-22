@@ -27,7 +27,7 @@ function list() {
 
 function navigate() {
     query=$(sqlite3 navigate.sqlite "SELECT path from paths where name='$1';")
-    echo $query
+    cd $query
 }
 
 #Setup database if it doesn't exist
