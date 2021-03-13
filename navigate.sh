@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+#!/bin/bash
 
 database="navigate.sqlite"
 
@@ -17,11 +17,17 @@ function remove() {
 }
 
 function list() {
+
+    #Set delimeter
+    IFS='|' 
+
+    #Get number of database entries
     query=$(sqlite3 $database "SELECT COUNT(name) from paths";)
 
+    #Get entry, split parts and display in terminal
     for ((i = 0; i < $query; i++)); do
-        row=$(sqlite3 $database "SELECT * FROM paths LIMIT 1 OFFSET $i;")
-        echo $row
+        read -a parts <<< $(sqlite3 $database "SELECT name,path FROM paths LIMIT 1 OFFSET $i;")
+        echo "${parts[0]}": "${parts[1]}"        
     done
 }
 
