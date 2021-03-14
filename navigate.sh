@@ -11,10 +11,24 @@ function setupDatabase() {
 
 # Functions for parameters
 function add() {
+    CheckForPathNameInDatabase $1
+
+    if [ $? -eq 1 ]
+    then
+        echo "Path with name $1 already exists"
+        return 0
+    fi
+
     sqlite3 $database "INSERT INTO paths VALUES ('$1', '$2');"
 }
 
 function remove() {
+    CheckForPathNameInDatabase $1
+    if [ $? -eq 0 ]
+    then
+        return
+    fi
+
     sqlite3 $database "DELETE FROM paths where name='$1';"
 }
 
@@ -41,26 +55,49 @@ function list() {
 
 function navigate() {
 
-    #Check if path exists in database
-    CheckForPathInDatabase $1
-    if [ $? -eq 1 ]
+    #Check if path with given name exists in database
+    CheckForPathNameInDatabase $1
+    if [ $? -eq 0 ]
     then 
-        #If so, navigate to it
-        navigate $1
-    else
-        echo Path \"$1\" doesn\'t exists!
-    fi 
+        return 
+    fi
 
-    query=$(sqlite3 navigate.sqlite "SELECT path from paths where name='$1';")
+    #Query path from database
+    query=$(sqlite3 $database "SELECT path from paths where name='$1';")
+
+    #Check if path exists in file systems
+    CheckIfPathExists $query
+    if [ $? -eq 0 ]
+    then
+        return
+    fi
+
+    #If all checks are ok, navigate to path
     cd "$query"
 }
 
 # Helper functions
-function CheckForPathInDatabase() {
-    subquery="SELECT name FROM paths WHERE name='$1'"
-    query=$(sqlite3 $database "SELECT EXISTS($subquery) from paths";)
+function CheckForPathNameInDatabase() {
+    query=$(sqlite3 $database "SELECT EXISTS(SELECT 1 FROM paths WHERE name='$1')")
 
-    return $query
+    if [ $query -eq 0 ]
+    then
+        echo "No path with name $1"
+        return 0
+    fi
+
+    return 0
+}
+
+function CheckIfPathExists() {
+    if [ -d $1 ]
+    then 
+        echo Directory \"$1\" exists
+        return 0
+    else
+        echo Directory \"$1\" doesn\'t exist
+        return 1
+    fi
 }
 
 #Setup database if it doesn't exist
