@@ -1,6 +1,6 @@
 #!/bin/bash
 
-database="navigate.sqlite"
+database=~/.navigate.db
 
 # Setup
 function setupDatabase() {
@@ -26,6 +26,12 @@ function list() {
     #Get number of database entries
     query=$(sqlite3 $database "SELECT COUNT(name) from paths";)
 
+    if [ $query -eq 0 ] 
+    then
+        echo No entries
+        return 1
+    fi
+
     #Get entry, split parts and display in terminal
     for ((i = 0; i < $query; i++)); do
         read -a parts <<< $(sqlite3 $database "SELECT name,path FROM paths LIMIT 1 OFFSET $i;")
@@ -35,7 +41,7 @@ function list() {
 
 function navigate() {
 
-    #Check if paths exist in database
+    #Check if path exists in database
     CheckForPathInDatabase $1
     if [ $? -eq 1 ]
     then 
@@ -49,7 +55,7 @@ function navigate() {
     cd "$query"
 }
 
-# Helper functiosn
+# Helper functions
 function CheckForPathInDatabase() {
     subquery="SELECT name FROM paths WHERE name='$1'"
     query=$(sqlite3 $database "SELECT EXISTS($subquery) from paths";)
